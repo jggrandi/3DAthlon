@@ -30,6 +30,13 @@ public class UpDownController
         startPos = controller.position;
 
     }
+
+    public void ManuallyAddEntry(float time, float value)
+    {
+        timeStamp.Add(time);
+        magnitude.Add(value);
+    }
+
     /*public void ReleaseButton()
     {
 
@@ -72,8 +79,9 @@ public class UpDownControl : MonoBehaviour {
     public float interval = 0.3f;
     [Tooltip("Just for debugging.")]
     public TextMesh go;
-
+    [Tooltip("Whether boundedScore should be used instad of the controller movement (for debugging).")]
     public bool controlWithInspector = false;
+    [Tooltip("For debugging, negative value climbs up, positive value climbs down.")]
     [Range(-1, 1)]
     public float boundedScore = 0.0f;
 
@@ -81,6 +89,12 @@ public class UpDownControl : MonoBehaviour {
     Material performanceBarMaterial;
     public Color lowPerformanceColor = Color.red;
     public Color highPerformanceColor = Color.green;
+
+    [Tooltip("Boost the climbing at startup, controllers must be connected for it to work.")]
+    public bool useStartupBoost = false;
+    [Tooltip("Negative value climbs up, positive value climbs down.")]
+    public float startupBoost = -1;
+
 
     // 
     private bool climbLocked = false;
@@ -138,6 +152,10 @@ public class UpDownControl : MonoBehaviour {
         {
             upDownControllers[i] = new UpDownController(controllers[i].transform, interval);
             performanceBar.GetComponent<Renderer>().material = new Material(performanceBar.GetComponent<Renderer>().material);
+            if (useStartupBoost)
+            {
+                upDownControllers[i].ManuallyAddEntry(Time.time, startupBoost);
+            }
         }
         if (performanceBar == null)
             performanceBar = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -152,7 +170,7 @@ public class UpDownControl : MonoBehaviour {
         for (int i = 0; i < upDownControllers.Length; i++)
         {
             if (controllers[i].controller == null)
-                return;
+                break;
             if(controllers[i].controller.GetHairTriggerDown())
                 upDownControllers[i].PressButton();
             if(controllers[i].controller.GetHairTrigger())
