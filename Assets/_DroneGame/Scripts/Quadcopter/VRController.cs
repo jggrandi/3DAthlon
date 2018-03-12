@@ -14,7 +14,7 @@ public class VRController : MonoBehaviour {
     public float targetPitch = 0;
     public float targetYaw = 0;
     public float targetRoll = 0;
-    public float scalingY = 0.001f;
+    public float scalingY = 0.1f;
     private float[] PID1 = { 1f, 0f, 1f };
     private float[] PID2 = { 10f, 3f, 1 };
     private float[] res1 = { 0f, 0f }; // integral, lasterror
@@ -96,7 +96,7 @@ public class VRController : MonoBehaviour {
             var cross = Vector3.Cross(droneFoward, handFoward);
             targetYaw = Vector3.Angle(droneFoward, handFoward);
             if (cross.y > 0.0f) { targetYaw = -targetYaw; }
-            targetYaw = SmoothMovement(targetYaw, 80.0f, 2);
+            targetYaw = SmoothMovement(targetYaw, 80.0f, 1);
 
             // Height
             var c = Remap(handfart.transform.localPosition.y, calibration[0], calibration[1], -2.0f, 2.0f);
@@ -145,7 +145,7 @@ public class VRController : MonoBehaviour {
         //  Measurement Always 0 because this rotation is relative.
         float yaw = PIDcontroller(PID2, res3, (targetYaw / 180.0f) * 0.1f, 0.0f);
         // Absolute.
-        //float yaw = PIDcontroller(PID2, res3, (targetYaw / 180.0f) * 0.1f, (-(ClampAngle(transform.rotation.eulerAngles.y))/180.0f)));
+        //float yaw = PIDcontroller(PID2, res3, (targetYaw / 180.0f) * 0.1f, (-(ClampAngle(transform.rotation.eulerAngles.y))/180.0f));
         float roll = PIDcontroller(PID2, res4, targetRoll, -(ClampAngle(transform.rotation.eulerAngles.z)) / 180.0f);
 
         // Apply the calculated values to drive the drone
